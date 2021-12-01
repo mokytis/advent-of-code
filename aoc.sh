@@ -186,7 +186,7 @@ EOF
 
 cmd="$1"
 
-if [[ -z "$cmd" ]];
+if [[ -z "$cmd" ]]; then
   >&2 echo "error: no command specified"
   >&2 usage
   exit
