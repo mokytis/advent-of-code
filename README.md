@@ -4,6 +4,7 @@ my solutions for [advent of code](https://adventofcode.com/).
 
 | Year | Days Solved |
 |-|-|
+| 2021 | 1 |
 | 2020 | 1, 2, 3 |
 
 ## file structure
