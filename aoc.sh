@@ -1,92 +1,149 @@
 #!/usr/bin/env bash
 
+source .config
+
 usage() {
   >&2 cat << EOF
-Usage: $ aoc.sh [AUTO|YEAR] [DAY]
+Usage: $ aoc.sh <command> [<args>]
 
-to fetch input and generate boilerplate for today's challenge run:
-$ aoc.sh auto
+Commands:
+  gen - fetch input and generate boilerplate
+  $ aoc.sh gen [YEAR] [DAY]
 
-to fetch input and generate boilerplate for a specific chllenge run:
-$ aoc.sh [YEAR] [DAY]
+    if no YEAR or DAY are specified then today is used
+    $ aoc.sh gen
 
-for example, day 4 of 2020
-$ aoc.sh 2020 4
+    to fetch input and generate boilerplate for a specific challenge run:
+    $ aoc.sh [YEAR] [DAY]
+
+    for example, day 4 of 2020
+    $ aoc.sh 2020 4
+
+  lb - display a leaderboard
+  $ aoc.sh lb [LEADERBOARD] [YEAR]
+
+    show leaderboard DEFAULT_LEADERBOARD from .config or
+    $ aoc.sh lb
+
+    show a specfic leaderboard
+    $ aoc.sh lb 1234567
+
+    show a specfic leaderboard for a specific year
+    $ aoc.sh lb 1234567 2021
+
+    by default the current year is used
 EOF
 }
 
-FILE=$(mktemp)
-
-source .cookie
-
-if [[ -z "$1" ]]; then
-  >&2 echo "error: no argument specified."
-  usage
-  exit
-fi
-
-if [[ "$1" == "auto" ]]; then
-  if [[ "$(date +%m)" == "12" ]]; then
-    YEAR=$(date +%Y)
-    DAY=$(date +%-d)
-    if [[ "$(date +%m)" -gt "25" ]]; then
-      >&2 echo "error: cannot use auto when it is after 25th december"
-      exit
-    fi
-  else
-    >&2 echo "error: cannot use auto when it isn't december"
-    exit
+show_leaderboard() {
+  leaderboard="$1"
+  if [[ -z "$leaderboard" ]]; then
+    leaderboard="$AOC_DEFAULT_LEADERBOARD"
   fi
-else
-  YEAR="$1"
-  DAY="$2"
+  year="$2"
+  if [[ -z "$year" ]]; then
+    year="$(date +%Y)"
+  fi
 
-  if [[ -z "$DAY" ]]; then
-    >&2 echo "error: day specified, but no year"
+  leaderboard_url="https://adventofcode.com/${year}/leaderboard/private/view/${leaderboard}.json"
+  leaderboard_file="${AOC_DIR}/${year}-${leaderboard}.json"
+
+  mkdir -p "$AOC_DIR"
+
+  if [ ! -f "$leaderboard_file" ]; then
+    curl --cookie "session=${AOC_COOKIE}" -s "$leaderboard_url" > "$leaderboard_file"
+  else
+    last_updated="$(($(date +%s) - $(date -r $leaderboard_file +%s)))"
+    if [[ "$last_updated" -gt "$AOC_CACHE_TIME" ]]; then
+      curl --cookie "session=${AOC_COOKIE}" -s "$leaderboard_url" > "$leaderboard_file"
+    fi
+  fi
+
+  jq -r '["SCORE", "STARS", "NAME"],
+    ([
+      .members[]]
+      | sort_by(.local_score)
+      | reverse[]
+      | [
+        .local_score,
+        .stars,
+        if .name then .name else ("(anonymous user #" + .id + ")") end
+        ]
+      )
+    | @tsv' "$leaderboard_file"
+}
+
+generate() {
+  file=$(mktemp)
+
+  if [[ -z "$1" ]]; then
+    >&2 echo "error: no argument specified."
     usage
     exit
   fi
-fi
+
+  if [[ "$1" == "auto" ]]; then
+    if [[ "$(date +%m)" == "12" ]]; then
+      year=$(date +%Y)
+      day=$(date +%-d)
+      if [[ "$(date +%m)" -gt "25" ]]; then
+        >&2 echo "error: cannot use auto when it is after 25th december"
+        exit
+      fi
+    else
+      >&2 echo "error: cannot use auto when it isn't december"
+      exit
+    fi
+  else
+    year="$1"
+    day="$2"
+
+    if [[ -z "$day" ]]; then
+      >&2 echo "error: day specified, but no year"
+      usage
+      exit
+    fi
+  fi
 
 
-DAY_FMT=$(printf "%02d" "${DAY}")
-URL="https://adventofcode.com/${YEAR}/day/${DAY}"
-INPUT_URL="${URL}/input"
+  day_fmt=$(printf "%02d" "${day}")
+  challenge_url="https://adventofcode.com/${year}/day/${day}"
+  input_url="${URL}/input"
 
-INPUT_DIR="./inputs/${YEAR}"
-SOL_DIR="./solutions/${YEAR}"
+  input_dir="./inputs/${year}"
+  sol_dir="./solutions/${year}"
 
-INPUT_FILE="./${INPUT_DIR}/${DAY_FMT}-input"
-SOL_FILE="./${SOL_DIR}/day_${DAY_FMT}.py"
+  input_file="./${input_dir}/${day_fmt}-input"
+  sol_file="./${sol_dir}/day_${day_fmt}.py"
 
-curl -s "${URL}" > "${FILE}"
-TITLE=$(grep day-desc "${FILE}" | sed -r 's/.+--- (Day [0-9]+: .+) ---.+/\1/g')
+  curl -s "${challenge_url}" > "${file}"
+  title=$(grep day-desc "${file}" | sed -r 's/.+--- (Day [0-9]+: .+) ---.+/\1/g')
 
-if [ -z "${TITLE}" ]; then
-  >&2 echo "error: challenge at URL ${URL} not found"
-fi
+  if [ -z "${title}" ]; then
+    >&2 echo "error: challenge at URL ${url} not found"
+  fi
 
-if [ -z "$AOC_COOKIE" ]; then
-  >&2 echo "no AOC_COOKIE set. cannot download input automatically"
-else
-  mkdir -p "${INPUT_DIR}"
-  curl -s --cookie "session=${AOC_COOKIE}" "${INPUT_URL}" > "${INPUT_FILE}"
+  if [ -z "$AOC_COOKIE" ]; then
+    >&2 echo "no AOC_COOKIE set. cannot download input automatically"
+  else
+    mkdir -p "${input_dir}"
+    curl -s --cookie "session=${AOC_COOKIE}" "${input_url}" > "${input_file}"
 
-fi
+  fi
 
-if test -f "$SOL_FILE"; then
-  >&2 echo "error: file ${SOL_FILE} already exists. i won't override it"
-  exit
-fi
+  if test -f "$sol_file"; then
+    >&2 echo "error: file ${sol_file} already exists. i won't override it"
+    exit
+  fi
 
-mkdir -p "${SOL_DIR}"
-cat << EOF > "${SOL_FILE}"
+  mkdir -p "${sol_dir}"
+  cat << EOF > "${sol_file}"
 #!/usr/bin/env python
 
 """
-Puzzle Title:     AoC ${YEAR} ${TITLE}
-Puzzle Link:      ${URL}
-Solution Author:  Luke Spademan <info@lukespademan.com>
+Puzzle Title:     AoC ${year} ${title}
+Puzzle Link:      ${challenge_url}
+Solution Author:  ${AOC_AUTHOR}
 Solution License: MIT
 """
 
@@ -121,4 +178,21 @@ if __name__ == "__main__":
     main()
 EOF
 
-chmod +x "${SOL_FILE}"
+  chmod +x "${sol_file}"
+}
+
+cmd="$1"
+shift
+case "$cmd" in
+  "lb")
+    show_leaderboard $@
+    ;;
+  "gen")
+    generate $@
+    ;;
+  *)
+    >&2 echo "error: invalid command ${cmd}"
+    usage
+    exit
+    ;;
+esac

@@ -1,0 +1,5 @@
+AOC_COOKIE="COOKIE FOR adventofcode.com"
+AOC_CACHE_TIME=900
+AOC_DEFAULT_LEADERBOARD="1234567"
+AOC_DIR="/tmp/aoc"
+AOC_AUTHOR="Joe Bloggs <joe@example.com>"
