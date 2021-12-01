@@ -3,10 +3,13 @@
 source .config
 
 usage() {
-  >&2 cat << EOF
-Usage: $ aoc.sh <command> [<args>]
+  cat << EOF
+usage: $ aoc.sh <command> [<args>]
 
 Commands:
+  help - display this help
+  $ aoc.sh help
+
   gen - fetch input and generate boilerplate
   $ aoc.sh gen [YEAR] [DAY]
 
@@ -78,7 +81,7 @@ generate() {
 
   if [[ -z "$1" ]]; then
     >&2 echo "error: no argument specified."
-    usage
+    >&2 usage
     exit
   fi
 
@@ -100,7 +103,7 @@ generate() {
 
     if [[ -z "$day" ]]; then
       >&2 echo "error: day specified, but no year"
-      usage
+      >&2 usage
       exit
     fi
   fi
@@ -182,8 +185,19 @@ EOF
 }
 
 cmd="$1"
+
+if [[ -z "$cmd" ]];
+  >&2 echo "error: no command specified"
+  >&2 usage
+  exit
+fi
+
 shift
 case "$cmd" in
+  "help")
+    usage
+    exit
+    ;;
   "lb")
     show_leaderboard $@
     ;;
@@ -192,7 +206,7 @@ case "$cmd" in
     ;;
   *)
     >&2 echo "error: invalid command ${cmd}"
-    usage
+    >&2 usage
     exit
     ;;
 esac
