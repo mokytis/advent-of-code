@@ -1,8 +1,29 @@
 #!/usr/bin/env bash
 
+usage() {
+  >&2 cat << EOF
+Usage: $ aoc.sh [AUTO|YEAR] [DAY]
+
+to fetch input and generate boilerplate for today's challenge run:
+$ aoc.sh auto
+
+to fetch input and generate boilerplate for a specific chllenge run:
+$ aoc.sh [YEAR] [DAY]
+
+for example, day 4 of 2020
+$ aoc.sh 2020 4
+EOF
+}
+
 FILE=$(mktemp)
 
 source .cookie
+
+if [[ -z "$1" ]]; then
+  >&2 echo "error: no argument specified."
+  usage
+  exit
+fi
 
 if [[ "$1" == "auto" ]]; then
   if [[ "$(date +%m)" == "12" ]]; then
@@ -19,6 +40,12 @@ if [[ "$1" == "auto" ]]; then
 else
   YEAR="$1"
   DAY="$2"
+
+  if [[ -z "$DAY" ]]; then
+    >&2 echo "error: day specified, but no year"
+    usage
+    exit
+  fi
 fi
 
 
