@@ -58,9 +58,11 @@ def get_bingo(call_order, grids):
                         all_called = False
                         cols_all_called[col] = False
                 if all_called:
-                    return grid, num
+                    grid.winning_num = num
+                    return grid
             if sum(cols_all_called) > 0:
-                return grid, num
+                grid.winning_num = num
+                return grid
 
 
 def last_winner(call_order, grids):
@@ -80,33 +82,34 @@ def last_winner(call_order, grids):
                     if i not in winners:
                         winners.append(i)
                         if len(winners) == len(grids):
-                            return grid, num
+                            grid.winning_num = num
+                            return grid
             if sum(cols_all_called) > 0:
                 if i not in winners:
                     winners.append(i)
                     if len(winners) == len(grids):
-                        return grid, num
-    return grid, num
+                        grid.winning_num = num
+                        return grid
 
 
-def calculate_score(grid, last_called):
+def calculate_score(grid):
     score = 0
     for row in grid.numbers:
         for item in row:
             if not item.called:
                 score += item.value
-    score *= last_called
+    score *= grid.winning_num
     return score
 
 
 def solve_part1(call_order, grids):
-    winning_grid, last_num = get_bingo(call_order, grids)
-    return calculate_score(winning_grid, last_num)
+    winning_grid = get_bingo(call_order, grids)
+    return calculate_score(winning_grid)
 
 
 def solve_part2(call_order, grids):
-    losing_grid, last_num = last_winner(call_order, grids)
-    return calculate_score(losing_grid, last_num)
+    losing_grid = last_winner(call_order, grids)
+    return calculate_score(losing_grid)
 
 
 def main():
