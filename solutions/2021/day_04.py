@@ -9,7 +9,6 @@ Solution License: MIT
 
 import fileinput
 from dataclasses import dataclass
-import copy
 
 
 @dataclass
