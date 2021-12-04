@@ -22,6 +22,9 @@ class BingoGrid:
     numbers: list[list[Square]]
     winning_num: int = -1
 
+    def has_won(self):
+        return self.winning_num != -1
+
 
 def parse_input():
     data = []
