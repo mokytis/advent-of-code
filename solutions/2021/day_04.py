@@ -68,7 +68,7 @@ def play_until_winner(call_order, grids):
                 return grid
 
 
-def last_winner(call_order, grids):
+def play_until_last_winner(call_order, grids):
     winners = set()
     for num in call_order:
         for i, grid in enumerate(grids):
@@ -95,7 +95,7 @@ def solve_part1(call_order, grids):
 
 
 def solve_part2(call_order, grids):
-    losing_grid = last_winner(call_order, grids)
+    losing_grid = play_until_last_winner(call_order, grids)
     return calculate_score(losing_grid)
 
 
