@@ -40,6 +40,15 @@ class BingoGrid:
         if sum(cols_all_called) > 0:
             self.winning_num = num_called
 
+    def calculate_score(self):
+        score = 0
+        for row in self.numbers:
+            for item in row:
+                if not item.called:
+                    score += item.value
+        score *= self.winning_num
+        return score
+
 
 def parse_input():
     data = []
@@ -79,24 +88,14 @@ def play_until_last_winner(call_order, grids):
                 return grid
 
 
-def calculate_score(grid):
-    score = 0
-    for row in grid.numbers:
-        for item in row:
-            if not item.called:
-                score += item.value
-    score *= grid.winning_num
-    return score
-
-
 def solve_part1(call_order, grids):
     winning_grid = play_until_winner(call_order, grids)
-    return calculate_score(winning_grid)
+    return winning_grid.calculate_score()
 
 
 def solve_part2(call_order, grids):
     losing_grid = play_until_last_winner(call_order, grids)
-    return calculate_score(losing_grid)
+    return losing_grid.calculate_score()
 
 
 def main():
