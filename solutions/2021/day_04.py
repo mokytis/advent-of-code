@@ -25,6 +25,21 @@ class BingoGrid:
     def has_won(self):
         return self.winning_num != -1
 
+    def play_num(self, num_called):
+        cols_all_called = [True for _ in range(5)]
+        for row in self.numbers:
+            all_called = True
+            for col, item in enumerate(row):
+                if item.value == num_called:
+                    item.called = True
+                if item.called == False:
+                    all_called = False
+                    cols_all_called[col] = False
+            if all_called:
+                self.winning_num = num_called
+        if sum(cols_all_called) > 0:
+            self.winning_num = num_called
+
 
 def parse_input():
     data = []
@@ -45,51 +60,23 @@ def parse_input():
     return call_order, grids
 
 
-def get_bingo(call_order, grids):
+def play_until_winner(call_order, grids):
     for num in call_order:
         for grid in grids:
-            cols_all_called = [True for _ in range(5)]
-            for row in grid.numbers:
-                all_called = True
-                for col, item in enumerate(row):
-                    if item.value == num:
-                        item.called = True
-                    if item.called == False:
-                        all_called = False
-                        cols_all_called[col] = False
-                if all_called:
-                    grid.winning_num = num
-                    return grid
-            if sum(cols_all_called) > 0:
-                grid.winning_num = num
+            grid.play_num(num)
+            if grid.has_won():
                 return grid
 
 
 def last_winner(call_order, grids):
-    winners = []
+    winners = set()
     for num in call_order:
         for i, grid in enumerate(grids):
-            cols_all_called = [True for _ in range(5)]
-            for row in grid.numbers:
-                all_called = True
-                for col, item in enumerate(row):
-                    if item.value == num:
-                        item.called = True
-                    if item.called == False:
-                        all_called = False
-                        cols_all_called[col] = False
-                if all_called:
-                    if i not in winners:
-                        winners.append(i)
-                        if len(winners) == len(grids):
-                            grid.winning_num = num
-                            return grid
-            if sum(cols_all_called) > 0:
-                if i not in winners:
-                    winners.append(i)
-                    if len(winners) == len(grids):
-                        grid.winning_num = num
-                        return grid
+            grid.play_num(num)
+            if grid.has_won():
+                winners.add(i)
+            if len(winners) == len(grids):
+                return grid
 
 
 def calculate_score(grid):
@@ -103,7 +90,7 @@ def calculate_score(grid):
 
 
 def solve_part1(call_order, grids):
-    winning_grid = get_bingo(call_order, grids)
+    winning_grid = play_until_winner(call_order, grids)
     return calculate_score(winning_grid)
 
 
