@@ -18,6 +18,12 @@ class Square:
     called: bool = False
 
 
+@dataclass
+class BingoGrid:
+    numbers: list[list[Square]]
+    winning_num: int = -1
+
+
 def parse_input():
     data = []
     grids = []
@@ -32,7 +38,7 @@ def parse_input():
             grid.append(row)
         else:
             if grid:
-                grids.append(grid)
+                grids.append(BingoGrid(grid))
                 grid = []
     return call_order, grids
 
@@ -41,7 +47,7 @@ def get_bingo(call_order, grids):
     for num in call_order:
         for grid in grids:
             cols_all_called = [True for _ in range(5)]
-            for row in grid:
+            for row in grid.numbers:
                 all_called = True
                 for col, item in enumerate(row):
                     if item.value == num:
@@ -60,7 +66,7 @@ def last_winner(call_order, grids):
     for num in call_order:
         for i, grid in enumerate(grids):
             cols_all_called = [True for _ in range(5)]
-            for row in grid:
+            for row in grid.numbers:
                 all_called = True
                 for col, item in enumerate(row):
                     if item.value == num:
@@ -83,7 +89,7 @@ def last_winner(call_order, grids):
 
 def calculate_score(grid, last_called):
     score = 0
-    for row in grid:
+    for row in grid.numbers:
         for item in row:
             if not item.called:
                 score += item.value
@@ -103,13 +109,11 @@ def solve_part2(call_order, grids):
 
 def main():
     call_order, grids = parse_input()
-    grids_p1 = copy.deepcopy(grids)
-    grids_p2 = copy.deepcopy(grids)
 
-    part1_ans = solve_part1(call_order, grids_p1)
+    part1_ans = solve_part1(call_order, grids)
     print(f"Part 1: {part1_ans}")
 
-    part2_ans = solve_part2(call_order, grids_p2)
+    part2_ans = solve_part2(call_order, grids)
     print(f"Part 2: {part2_ans}")
 
 
