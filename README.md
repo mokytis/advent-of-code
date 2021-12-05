@@ -2,10 +2,10 @@
 
 my solutions for [advent of code](https://adventofcode.com/).
 
-| Year | Days Solved |
-| -    | -           |
-| 2021 | 1, 2, 3, 4  |
-| 2020 | 1, 2, 3     |
+| Year | Days Solved   |
+| -    | -             |
+| 2021 | 1, 2, 3, 4, 5 |
+| 2020 | 1, 2, 3       |
 
 ## file structure
 
