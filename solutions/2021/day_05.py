@@ -9,6 +9,7 @@ Solution License: MIT
 
 import fileinput
 from dataclasses import dataclass
+from collections import defaultdict
 
 
 @dataclass
@@ -74,26 +75,20 @@ def parse_input():
 
 
 def solve_part1(data):
-    grid_squares = {}
+    grid_squares = defaultdict(int)
     for line in data:
         if line.is_horizonal() or line.is_vertical():
             for point in line.points():
-                if point not in grid_squares:
-                    grid_squares[point] = 1
-                else:
-                    grid_squares[point] += 1
+                grid_squares[point] += 1
 
     return len([point for point in grid_squares if grid_squares[point] >= 2])
 
 
 def solve_part2(data):
-    grid_squares = {}
+    grid_squares = defaultdict(int)
     for line in data:
         for point in line.points():
-            if point not in grid_squares:
-                grid_squares[point] = 1
-            else:
-                grid_squares[point] += 1
+            grid_squares[point] += 1
 
     return len([point for point in grid_squares if grid_squares[point] >= 2])
 
