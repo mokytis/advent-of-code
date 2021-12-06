@@ -43,10 +43,10 @@ def solve_part2(data):
 def main():
     data = parse_input()
 
-    part1_ans = solve_part1(copy.deepcopy(data))
+    part1_ans = solve_part1(copy.copy(data))
     print(f"Part 1: {part1_ans}")
 
-    part2_ans = solve_part2(copy.deepcopy(data))
+    part2_ans = solve_part2(copy.copy(data))
     print(f"Part 2: {part2_ans}")
 
 
