@@ -77,13 +77,15 @@ show_leaderboard() {
 }
 
 generate() {
-  file=$(mktemp)
+  tmpfile=$(mktemp)
 
+  cat << EOF > /dev/null
   if [[ -z "$1" ]]; then
     >&2 echo "error: no argument specified."
     >&2 usage
     exit
   fi
+EOF
 
   if [[ "$1" == "auto" ]]; then
     if [[ "$(date +%m)" == "12" ]]; then
@@ -119,8 +121,8 @@ generate() {
   input_file="./${input_dir}/${day_fmt}-input"
   sol_file="./${sol_dir}/day_${day_fmt}.py"
 
-  curl -s "${challenge_url}" > "${file}"
-  title=$(grep day-desc "${file}" | sed -r 's/.+--- (Day [0-9]+: .+) ---.+/\1/g')
+  curl -s "${challenge_url}" > "${tmpfile}"
+  title=$(grep day-desc "${tmpfile}" | sed -r 's/.+--- (Day [0-9]+: .+) ---.+/\1/g')
 
   if [ -z "${title}" ]; then
     >&2 echo "error: challenge at URL ${url} not found"
