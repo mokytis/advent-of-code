@@ -9,6 +9,7 @@ Solution License: MIT
 
 import fileinput
 from collections import defaultdict
+from statistics import median
 
 
 def parse_input():
@@ -20,11 +21,8 @@ def parse_input():
 
 
 def solve_part1(data):
-    mid_points = defaultdict(int)
-    for point in range(min(data), max(data)):
-        for num in data:
-            mid_points[point] += abs(point - num)
-    return mid_points[min(mid_points, key=mid_points.get)]
+    mid_point = round(median(data))
+    return sum(abs(point - mid_point) for point in data)
 
 
 def solve_part2(data):
