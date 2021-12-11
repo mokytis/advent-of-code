@@ -17,9 +17,7 @@ def parse_input():
         if line:
             training, test = line.split(" | ")
             data.append(
-                {
-                    "training": [set(digit) for digit in training.split(" ")],
-                    "test": [set(digit) for digit in test.split(" ")],
+                { "training": [set(digit) for digit in training.split(" ")], "test": [set(digit) for digit in test.split(" ")],
                 }
             )
     return data
