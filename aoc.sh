@@ -113,7 +113,7 @@ EOF
 
   day_fmt=$(printf "%02d" "${day}")
   challenge_url="https://adventofcode.com/${year}/day/${day}"
-  input_url="${URL}/input"
+  input_url="${challenge_url}/input"
 
   input_dir="./inputs/${year}"
   sol_dir="./solutions/${year}"
@@ -133,7 +133,6 @@ EOF
   else
     mkdir -p "${input_dir}"
     curl -s --cookie "session=${AOC_COOKIE}" "${input_url}" > "${input_file}"
-
   fi
 
   if test -f "$sol_file"; then
