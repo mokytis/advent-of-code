@@ -27,15 +27,8 @@ def solve_part1(data):
     total = 0
     for row in data:
         for item in row["test"]:
-            match len(item):
-                case 2:
-                    total += 1
-                case 4:
-                    total += 1
-                case 3:
-                    total += 1
-                case 7:
-                    total += 1
+            if len(item) in {2,4,3,7}:
+                total += 1
     return total
 
 
