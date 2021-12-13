@@ -35,18 +35,12 @@ def solve_part1(data):
 
 def solve_part2(data):
     total = 0
+    len_dig = {2: "1", 4: "4", 3: "7", 7: "8"}
     for row in data:
         digits = {}
         for item in row["training"]:
-            match len(item):
-                case 2:
-                    digits["1"] = item
-                case 4:
-                    digits["4"] = item
-                case 3:
-                    digits["7"] = item
-                case 7:
-                    digits["8"] = item
+            if len(item) in len_dig:
+                digits[len_dig.get(len(item))] = item
         num = 0
         for item in row["test"]:
             num *= 10
