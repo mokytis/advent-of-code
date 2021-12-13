@@ -65,13 +65,35 @@ def find_paths(graph, path=None):
     return paths
 
 
+def find_paths2(graph, path=None):
+    paths = []
+    if path == None:
+        path = ["start"]
+    last_visited = path[-1]
+    for n in graph.nodes[last_visited].connections:
+        if graph.nodes[n].is_small() and n in path:
+            if n in ("start", "end"):
+                continue
+            small = [x for x in path if x.islower()]
+            if len(small) >= len(set(small)) + 1:
+                continue
+        np = copy.copy(path)
+        np.append(n)
+        if n == "end":
+            paths.append(np)
+        else:
+            paths += find_paths2(graph, np)
+    return paths
+
+
 def solve_part1(data):
     paths = find_paths(data)
     return len(paths)
 
 
 def solve_part2(data):
-    ...
+    paths = find_paths2(data)
+    return len(paths)
 
 
 def main():
